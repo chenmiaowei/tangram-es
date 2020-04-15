@@ -216,7 +216,8 @@ public class MapController {
         nativeShutdown(mapPointer);
         Log.e("TANGRAM", "<<< http requests: " + httpRequestHandles.size());
 
-        for (MapData mapData : clientTileSources.values()) {
+        Collection<MapData> values = clientTileSources.values();
+        for (MapData mapData : values) {
             mapData.remove();
         }
 
