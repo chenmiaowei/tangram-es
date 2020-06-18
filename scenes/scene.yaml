@@ -484,7 +484,7 @@ layers:
             exclusive: true
             priority: 1
             filter:
-                kind: [park, cemetery, graveyard]
+                class: [park, cemetery, graveyard]
                 any:
                     - { $zoom: { min: 16 } }
                     - { area: { min: 500px2 } }
@@ -504,7 +504,7 @@ layers:
             exclusive: true
             priority: 2
             filter:
-                kind: forest
+                class: forest
                 any:
                     - { $zoom: { min: 7 }, tier: 1 }
                     - { $zoom: { min: 9 }, tier: { max: 3 } }
@@ -524,7 +524,7 @@ layers:
             filter:
                 name: true
                 not:
-                    kind: [viewpoint, bicycle_rental, car_sharing]
+                    class: [viewpoint, bicycle_rental, car_sharing]
                 $zoom: { min: 15 }
             draw:
                 points:
@@ -644,7 +644,7 @@ layers:
                         priority: 1
                         font:
                             family: Open Sans
-                            size: 12px
+#                            size: 12px
                             fill: [0, 0, 0, .8]
                             stroke: { color: white, width: 4 }
                             transform: uppercase

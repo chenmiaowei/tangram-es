@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements MapController.Sce
     private static final String TAG = "TangramDemo";
 
     private static final String[] SCENE_PRESETS = {
-            "asset:///scene.yaml",
+            "asset:///gomap.yaml",
             "https://www.nextzen.org/carto/bubble-wrap-style/9/bubble-wrap-style.zip",
             "https://www.nextzen.org/carto/refill-style/11/refill-style.zip",
             "https://www.nextzen.org/carto/walkabout-style/7/walkabout-style.zip",
@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements MapController.Sce
     String pointStylingPath = "layers.touch.point.draw.icons";
     ArrayList<Marker> pointMarkers = new ArrayList<>();
 
+
     boolean showTileInfo = false;
 
     @Override
@@ -80,15 +81,16 @@ public class MainActivity extends AppCompatActivity implements MapController.Sce
 
         setContentView(R.layout.main);
 
-        if (NEXTZEN_API_KEY.isEmpty() || NEXTZEN_API_KEY.equals("null")) {
-            Log.w(TAG, "No API key found! Nextzen data sources require an API key.\n" +
-                    "Sign up for a free key at https://developers.nextzen.org/ and set it\n" +
-                    "in your local Gradle properties file (~/.gradle/gradle.properties)\n" +
-                    "as 'nextzenApiKey=YOUR-API-KEY-HERE'");
-        }
+//        if (NEXTZEN_API_KEY.isEmpty() || NEXTZEN_API_KEY.equals("null")) {
+//            Log.w(TAG, "No API key found! Nextzen data sources require an API key.\n" +
+//                    "Sign up for a free key at https://developers.nextzen.org/ and set it\n" +
+//                    "in your local Gradle properties file (~/.gradle/gradle.properties)\n" +
+//                    "as 'nextzenApiKey=YOUR-API-KEY-HERE'");
+//        }
 
         // Create a scene update to apply our API key in the scene.
-        sceneUpdates.add(new SceneUpdate("global.sdk_api_key", NEXTZEN_API_KEY));
+//        sceneUpdates.add(new SceneUpdate("global.sdk_api_key", "1Lvi3WcfRhKN_68u7W2Tcg"));
+//        sceneUpdates.add(new SceneUpdate("global.selected", "[\"5\"]"));
 
         // Set up a text view to allow selecting preset and custom scene URLs.
         sceneSelector = (PresetSelectionTextView)findViewById(R.id.sceneSelector);
@@ -103,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements MapController.Sce
 
         // Grab a reference to our map view.
         view = (MapView)findViewById(R.id.map);
-        view.getMapAsync(this, getHttpHandler());
+//        view.getMapAsync(this, getHttpHandler());
+        view.getMapAsync(this);
     }
 
     @Override
@@ -115,8 +118,8 @@ public class MainActivity extends AppCompatActivity implements MapController.Sce
         String sceneUrl = sceneSelector.getCurrentString();
         map.setSceneLoadListener(this);
 
-        LngLat startPoint = new LngLat(-74.00976419448854, 40.70532700869127);
-        map.updateCameraPosition(CameraUpdateFactory.newLngLatZoom(startPoint, 16));
+        LngLat startPoint = new LngLat(54.43693, 24.430089);
+        map.updateCameraPosition(CameraUpdateFactory.newLngLatZoom(startPoint, 18));
         Log.d("Tangram", "START SCENE LOAD");
         map.loadSceneFileAsync(sceneUrl, sceneUpdates);
 
@@ -124,43 +127,43 @@ public class MainActivity extends AppCompatActivity implements MapController.Sce
         p.setStylingFromPath(pointStylingPath);
         p.setPoint(startPoint);
         pointMarkers.add(p);
-
+//
         TouchInput touchInput = map.getTouchInput();
         touchInput.setTapResponder(this);
-        touchInput.setDoubleTapResponder(this);
-        touchInput.setLongPressResponder(this);
-
+//        touchInput.setDoubleTapResponder(this);
+//        touchInput.setLongPressResponder(this);
+//
         map.setFeaturePickListener(this);
-        map.setLabelPickListener(this);
-        map.setMarkerPickListener(this);
+//        map.setLabelPickListener(this);
+//        map.setMarkerPickListener(this);
+//
+//        map.setMapChangeListener(new MapChangeListener() {
+//            @Override
+//            public void onViewComplete() {
+//                Log.d(TAG, "View complete");
+//            }
+//
+//            @Override
+//            public void onRegionWillChange(boolean animated) {
+//                Log.d(TAG, "On Region Will Change Animated: " + animated);
+//            }
+//
+//            @Override
+//            public void onRegionIsChanging() {
+//                Log.d(TAG, "On Region Is Changing");
+//            }
+//
+//            @Override
+//            public void onRegionDidChange(boolean animated) {
+//                Log.d(TAG, "On Region Did Change Animated: " + animated);
+//            }
+//        });
 
-        map.setMapChangeListener(new MapChangeListener() {
-            @Override
-            public void onViewComplete() {
-                Log.d(TAG, "View complete");
-            }
-
-            @Override
-            public void onRegionWillChange(boolean animated) {
-                Log.d(TAG, "On Region Will Change Animated: " + animated);
-            }
-
-            @Override
-            public void onRegionIsChanging() {
-                Log.d(TAG, "On Region Is Changing");
-            }
-
-            @Override
-            public void onRegionDidChange(boolean animated) {
-                Log.d(TAG, "On Region Did Change Animated: " + animated);
-            }
-        });
-
-        map.updateCameraPosition(CameraUpdateFactory.newLngLatZoom(new LngLat(-74.00976419448854, 40.70532700869127), 16));
-
-        mapData = map.addDataLayer("touch");
-
-        map.setPickRadius(10);
+//        map.updateCameraPosition(CameraUpdateFactory.newLngLatZoom(new LngLat(54.43693, 24.430089), 16));
+//
+//        mapData = map.addDataLayer("osm");
+//
+//        map.setPickRadius(10);
     }
 
     @Override
@@ -233,20 +236,20 @@ public class MainActivity extends AppCompatActivity implements MapController.Sce
         LngLat tappedPoint = map.screenPositionToLngLat(new PointF(x, y));
 
         map.pickFeature(x, y);
-        map.pickLabel(x, y);
-        map.pickMarker(x, y);
-
-        map.updateCameraPosition(CameraUpdateFactory.setPosition(tappedPoint), 1000, new MapController.CameraAnimationCallback() {
-            @Override
-            public void onFinish() {
-                Log.d("Tangram","finished!");
-            }
-
-            @Override
-            public void onCancel() {
-                Log.d("Tangram","canceled!");
-            }
-        });
+//        map.pickLabel(x, y);
+//        map.pickMarker(x, y);
+//
+//        map.updateCameraPosition(CameraUpdateFactory.setPosition(tappedPoint), 1000, new MapController.CameraAnimationCallback() {
+//            @Override
+//            public void onFinish() {
+//                Log.d("Tangram","finished!");
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                Log.d("Tangram","canceled!");
+//            }
+//        });
 
         return true;
     }
@@ -287,6 +290,14 @@ public class MainActivity extends AppCompatActivity implements MapController.Sce
             Log.d(TAG, "Empty selection");
             return;
         }
+
+        map.removeAllMarkers();
+
+        String sceneUrl = sceneSelector.getCurrentString();
+        ArrayList<SceneUpdate> sceneUpdatesSelected = new ArrayList<>();
+//        sceneUpdatesSelected.add(new SceneUpdate("global.sdk_api_key", "1Lvi3WcfRhKN_68u7W2Tcg"));
+        sceneUpdatesSelected.add(new SceneUpdate("global.selected", "[\"" + result.getProperties().get("id") + "\"]"));
+        map.loadSceneFile(sceneUrl, sceneUpdatesSelected);
 
         String name = result.getProperties().get("name");
         if (name == null || name.isEmpty()) {

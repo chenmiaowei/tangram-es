@@ -105,8 +105,9 @@ public class MapController {
     public interface SceneLoadListener {
         /**
          * Received when a scene load or update finishes. If sceneError is not null then the operation did not succeed.
-         * @param sceneId The identifier returned by {@link #loadSceneYamlAsync(String, String, List<SceneUpdate>)} or
-         * {@link #loadSceneFileAsync(String, List<SceneUpdate>)}.
+         *
+         * @param sceneId    The identifier returned by {@link #loadSceneYamlAsync(String, String, List<SceneUpdate>)} or
+         *                   {@link #loadSceneFileAsync(String, List<SceneUpdate>)}.
          * @param sceneError A {@link SceneError} holding error information, or null if no error occurred.
          */
         void onSceneReady(final int sceneId, final SceneError sceneError);
@@ -114,6 +115,7 @@ public class MapController {
 
     public interface CameraAnimationCallback {
         void onFinish();
+
         void onCancel();
     }
 
@@ -129,6 +131,7 @@ public class MapController {
 
     /**
      * Capture MapView as Bitmap.
+     *
      * @param waitForCompleteView Delay the capture until the view is fully loaded and
      *                            no ease- or label-animation is running.
      */
@@ -139,9 +142,10 @@ public class MapController {
 
     /**
      * Construct a MapController
+     *
      * @param context The application Context in which the map will function; the asset
-     * bundle for this activity must contain all the local files that the map
-     * will need.
+     *                bundle for this activity must contain all the local files that the map
+     *                will need.
      */
     protected MapController(@NonNull Context context) {
         if (Build.VERSION.SDK_INT > 18) {
@@ -168,8 +172,9 @@ public class MapController {
     /**
      * Responsible to configure {@link MapController} configuration on the ui thread.
      * Must be called from the ui thread post instantiation of {@link MapController}
+     *
      * @param viewHolder GLViewHolder for the map display
-     * @param handler {@link HttpHandler} to initialize httpHandler for network handling
+     * @param handler    {@link HttpHandler} to initialize httpHandler for network handling
      */
     void UIThreadInit(@NonNull final GLViewHolder viewHolder, @Nullable final HttpHandler handler) {
 
@@ -210,15 +215,18 @@ public class MapController {
      * If client code extends MapController and overrides this method, then it must call super.dispose()
      */
     protected synchronized void dispose() {
-        if (mapPointer == 0) { return; }
+        if (mapPointer == 0) {
+            return;
+        }
 
         Log.e("TANGRAM", ">>> dispose");
         nativeShutdown(mapPointer);
         Log.e("TANGRAM", "<<< http requests: " + httpRequestHandles.size());
 
         for (MapData mapData : clientTileSources.values()) {
-            mapData.remove();
+            mapData.remove(false);
         }
+        clientTileSources.clear();
 
         Log.e("TANGRAM", "<<< 1");
         clientTileSources.clear();
@@ -257,6 +265,7 @@ public class MapController {
     /**
      * Returns the {@link GLViewHolder} instance for the client application, which can be further used to get the underlying
      * GLSurfaceView or Client provided implementation for GLViewHolder, to forward any explicit view controls, example Transformations, etc.
+     *
      * @return GLViewHolder used by the Map Renderer
      */
     @Nullable
@@ -268,6 +277,7 @@ public class MapController {
      * Load a new scene file synchronously.
      * Use {@link #setSceneLoadListener(SceneLoadListener)} for notification when the new scene is
      * ready.
+     *
      * @param path Location of the YAML scene file within the application assets
      * @return Scene ID An identifier for the scene being loaded, the same value will be passed to
      * {@link SceneLoadListener#onSceneReady(int sceneId, SceneError sceneError)} when loading is complete.
@@ -280,6 +290,7 @@ public class MapController {
      * Load a new scene file asynchronously.
      * Use {@link #setSceneLoadListener(SceneLoadListener)} for notification when the new scene is
      * ready.
+     *
      * @param path Location of the YAML scene file within the application assets
      * @return Scene ID An identifier for the scene being loaded, the same value will be passed to
      * {@link SceneLoadListener#onSceneReady(int sceneId, SceneError sceneError)} when loading is complete.
@@ -293,7 +304,8 @@ public class MapController {
      * If scene updates triggers an error, they won't be applied.
      * Use {@link #setSceneLoadListener(SceneLoadListener)} for notification when the new scene is
      * ready.
-     * @param path Location of the YAML scene file within the application assets
+     *
+     * @param path         Location of the YAML scene file within the application assets
      * @param sceneUpdates List of {@code SceneUpdate}
      * @return Scene ID An identifier for the scene being loaded, the same value will be passed to
      * {@link SceneLoadListener#onSceneReady(int sceneId, SceneError sceneError)} when loading is complete.
@@ -312,7 +324,8 @@ public class MapController {
      * If scene updates triggers an error, they won't be applied.
      * Use {@link #setSceneLoadListener(SceneLoadListener)} for notification when the new scene is
      * ready.
-     * @param path Location of the YAML scene file within the application assets
+     *
+     * @param path         Location of the YAML scene file within the application assets
      * @param sceneUpdates List of {@code SceneUpdate}
      * @return Scene ID An identifier for the scene being loaded, the same value will be passed to
      * {@link SceneLoadListener#onSceneReady(int sceneId, SceneError sceneError)} when loading is complete.
@@ -331,7 +344,8 @@ public class MapController {
      * If scene updates triggers an error, they won't be applied.
      * Use {@link #setSceneLoadListener(SceneLoadListener)} for notification when the new scene is
      * ready.
-     * @param yaml YAML scene String
+     *
+     * @param yaml         YAML scene String
      * @param resourceRoot base path to resolve relative URLs
      * @param sceneUpdates List of {@code SceneUpdate}
      * @return Scene ID An identifier for the scene being loaded, the same value will be passed to
@@ -351,7 +365,8 @@ public class MapController {
      * If scene updates triggers an error, they won't be applied.
      * Use {@link #setSceneLoadListener(SceneLoadListener)} for notification when the new scene is
      * ready.
-     * @param yaml YAML scene String
+     *
+     * @param yaml         YAML scene String
      * @param resourceRoot base path to resolve relative URLs
      * @param sceneUpdates List of {@code SceneUpdate}
      * @return Scene ID An identifier for the scene being loaded, the same value will be passed to
@@ -368,15 +383,17 @@ public class MapController {
 
     /**
      * Set the camera position of the map view
+     *
      * @param update CameraUpdate to modify current camera position
      */
     public void updateCameraPosition(@NonNull final CameraUpdate update) {
-        updateCameraPosition(update, 0, DEFAULT_EASE_TYPE,null);
+        updateCameraPosition(update, 0, DEFAULT_EASE_TYPE, null);
     }
 
     /**
      * Animate the camera position of the map view with the default easing function
-     * @param update CameraUpdate to update current camera position
+     *
+     * @param update   CameraUpdate to update current camera position
      * @param duration Time in milliseconds to ease to the updated position
      */
     public void updateCameraPosition(@NonNull final CameraUpdate update, final int duration) {
@@ -385,9 +402,10 @@ public class MapController {
 
     /**
      * Animate the camera position of the map view with an easing function
-     * @param update CameraUpdate to update current camera position
+     *
+     * @param update   CameraUpdate to update current camera position
      * @param duration Time in milliseconds to ease to the updated position
-     * @param ease Type of easing to use
+     * @param ease     Type of easing to use
      */
     public void updateCameraPosition(@NonNull final CameraUpdate update, final int duration, @NonNull final EaseType ease) {
         updateCameraPosition(update, duration, ease, null);
@@ -395,9 +413,10 @@ public class MapController {
 
     /**
      * Animate the camera position of the map view and run a callback when the animation completes
-     * @param update CameraUpdate to update current camera position
+     *
+     * @param update   CameraUpdate to update current camera position
      * @param duration Time in milliseconds to ease to the updated position
-     * @param cb Callback that will run when the animation is finished or canceled
+     * @param cb       Callback that will run when the animation is finished or canceled
      */
     public void updateCameraPosition(@NonNull final CameraUpdate update, final int duration, @NonNull final CameraAnimationCallback cb) {
         updateCameraPosition(update, duration, DEFAULT_EASE_TYPE, cb);
@@ -406,10 +425,11 @@ public class MapController {
     /**
      * Animate the camera position of the map view with an easing function and run a callback when
      * the animation completes
-     * @param update CameraUpdate to update current camera position
+     *
+     * @param update   CameraUpdate to update current camera position
      * @param duration Time in milliseconds to ease to the updated position
-     * @param ease Type of easing to use
-     * @param cb Callback that will run when the animation is finished or canceled
+     * @param ease     Type of easing to use
+     * @param cb       Callback that will run when the animation is finished or canceled
      */
     public void updateCameraPosition(@NonNull final CameraUpdate update, final int duration, @NonNull final EaseType ease, @Nullable final CameraAnimationCallback cb) {
         checkPointer(mapPointer);
@@ -429,6 +449,7 @@ public class MapController {
     /**
      * Smoothly animate over an arc to a new camera position for the map view
      * FlyTo duration is calculated assuming speed of 1 unit and distance between the current and new positions
+     *
      * @param position CameraPosition of the destination
      * @param callback Callback that will run when the animation is finished or canceled
      */
@@ -438,6 +459,7 @@ public class MapController {
 
     /**
      * Smoothly animate over an arc to a new camera position for the map view in provided time duration
+     *
      * @param position CameraPosition of the destination
      * @param duration Time in milliseconds of the animation
      * @param callback Callback that will run when the animation is finished or canceled
@@ -449,9 +471,10 @@ public class MapController {
     /**
      * Smoothly animate over an arc to a new camera position for the map view
      * FlyTo duration is calculated using speed and distance between the current and new positions
+     *
      * @param position CameraPosition of the destination
      * @param callback Callback that will run when the animation is finished or canceled
-     * @param speed Scaling factor for animation duration (recommended range is 0.1 - 10)
+     * @param speed    Scaling factor for animation duration (recommended range is 0.1 - 10)
      */
     public void flyToCameraPosition(@NonNull final CameraPosition position, @Nullable final CameraAnimationCallback callback, final float speed) {
         flyToCameraPosition(position, -1, callback, speed);
@@ -495,6 +518,7 @@ public class MapController {
 
     /**
      * Get the {@link CameraPosition} of the map view
+     *
      * @return The current camera position
      */
     @NonNull
@@ -504,14 +528,15 @@ public class MapController {
 
     /**
      * Get the {@link CameraPosition} of the map view
+     *
      * @param out CameraPosition to be reused as the output
      * @return the current camera position of the map view
      */
     @NonNull
     public CameraPosition getCameraPosition(@NonNull final CameraPosition out) {
         checkPointer(mapPointer);
-        final double[] pos = { 0, 0 };
-        final float[] zrt = { 0, 0, 0 };
+        final double[] pos = {0, 0};
+        final float[] zrt = {0, 0, 0};
         nativeGetCameraPosition(mapPointer, pos, zrt);
         out.longitude = pos[0];
         out.latitude = pos[1];
@@ -531,8 +556,9 @@ public class MapController {
 
     /**
      * Get the {@link CameraPosition} that that encloses the given bounds with at least the given amount of padding on each side.
-     * @param sw south-west coordinate
-     * @param ne northwest coordinate
+     *
+     * @param sw      south-west coordinate
+     * @param ne      northwest coordinate
      * @param padding The minimum distance to keep between the bounds and the edges of the view
      * @return The enclosing camera position
      */
@@ -543,10 +569,11 @@ public class MapController {
 
     /**
      * Get the {@link CameraPosition} that that encloses the given bounds with at least the given amount of padding on each side.
-     * @param sw south-west coordinate
-     * @param ne northwest coordinate
+     *
+     * @param sw      south-west coordinate
+     * @param ne      northwest coordinate
      * @param padding The minimum distance to keep between the bounds and the edges of the view
-     * @param out CameraPosition to be reused as the output
+     * @param out     CameraPosition to be reused as the output
      * @return The enclosing camera position
      */
     @NonNull
@@ -556,7 +583,7 @@ public class MapController {
         nativeGetEnclosingCameraPosition(mapPointer, sw.longitude, sw.latitude, ne.longitude, ne.latitude, pad, lngLatZoom);
         out.longitude = lngLatZoom[0];
         out.latitude = lngLatZoom[1];
-        out.zoom = (float)lngLatZoom[2];
+        out.zoom = (float) lngLatZoom[2];
         out.rotation = 0.f;
         out.tilt = 0.f;
         return out;
@@ -564,6 +591,7 @@ public class MapController {
 
     /**
      * Set the camera type for the map view
+     *
      * @param type A {@code CameraType}
      */
     public void setCameraType(@NonNull final CameraType type) {
@@ -573,6 +601,7 @@ public class MapController {
 
     /**
      * Get the camera type currently in use for the map view
+     *
      * @return A {@code CameraType}
      */
     public CameraType getCameraType() {
@@ -582,6 +611,7 @@ public class MapController {
 
     /**
      * Get the minimum zoom level of the map view. The default minimum zoom is 0.
+     *
      * @return The zoom level
      */
     public float getMinimumZoomLevel() {
@@ -591,9 +621,10 @@ public class MapController {
 
     /**
      * Set the minimum zoom level of the map view.
-     *
+     * <p>
      * Values less than the default minimum zoom will be clamped. Assigning a value greater than the
      * current maximum zoom will set the maximum zoom to this value.
+     *
      * @param minimumZoom The zoom level
      */
     public void setMinimumZoomLevel(float minimumZoom) {
@@ -603,6 +634,7 @@ public class MapController {
 
     /**
      * Get the maximum zoom level of the map view. The default maximum zoom is 20.5.
+     *
      * @return The zoom level
      */
     public float getMaximumZoomLevel() {
@@ -612,9 +644,10 @@ public class MapController {
 
     /**
      * Set the maximum zoom level of the map view.
-     *
+     * <p>
      * Values greater than the default maximum zoom will be clamped. Assigning a value less than the
      * current minimum zoom will set the minimum zoom to this value.
+     *
      * @param maximumZoom The zoom level
      */
     public void setMaximumZoomLevel(float maximumZoom) {
@@ -624,6 +657,7 @@ public class MapController {
 
     /**
      * Find the geographic coordinates corresponding to the given position on screen
+     *
      * @param screenPosition Position in pixels from the top-left corner of the map area
      * @return LngLat corresponding to the given point, or null if the screen position
      * does not intersect a geographic location (this can happen at high tilt angles).
@@ -631,7 +665,7 @@ public class MapController {
     @Nullable
     public LngLat screenPositionToLngLat(@NonNull final PointF screenPosition) {
         checkPointer(mapPointer);
-        final double[] tmp = { screenPosition.x, screenPosition.y };
+        final double[] tmp = {screenPosition.x, screenPosition.y};
         if (nativeScreenPositionToLngLat(mapPointer, tmp)) {
             return new LngLat(tmp[0], tmp[1]);
         }
@@ -640,6 +674,7 @@ public class MapController {
 
     /**
      * Find the position on screen corresponding to the given geographic coordinates
+     *
      * @param lngLat Geographic coordinates
      * @return Position in pixels from the top-left corner of the map area (the point
      * may not lie within the viewable screen area)
@@ -647,18 +682,19 @@ public class MapController {
     @NonNull
     public PointF lngLatToScreenPosition(@NonNull final LngLat lngLat) {
         checkPointer(mapPointer);
-        final double[] tmp = { lngLat.longitude, lngLat.latitude };
+        final double[] tmp = {lngLat.longitude, lngLat.latitude};
         nativeLngLatToScreenPosition(mapPointer, tmp);
-        return new PointF((float)tmp[0], (float)tmp[1]);
+        return new PointF((float) tmp[0], (float) tmp[1]);
     }
 
     /**
      * Construct a collection of drawable map features.
+     *
      * @param name The name of the data collection. Once added to a map, features from this
-     * {@code MapData} will be available from a data source with this name, just like a data source
-     * specified in a scene file. You cannot create more than one data source with the same name.
-     * If you call {@code addDataLayer} with the same name more than once, the same {@code MapData}
-     * object will be returned.
+     *             {@code MapData} will be available from a data source with this name, just like a data source
+     *             specified in a scene file. You cannot create more than one data source with the same name.
+     *             If you call {@code addDataLayer} with the same name more than once, the same {@code MapData}
+     *             object will be returned.
      */
     public MapData addDataLayer(final String name) {
         return addDataLayer(name, false);
@@ -666,14 +702,15 @@ public class MapController {
 
     /**
      * Construct a collection of drawable map features.
-     * @param name The name of the data collection. Once added to a map, features from this
+     *
+     * @param name             The name of the data collection. Once added to a map, features from this
      * @param generateCentroid boolean to control <a href=
-     * "https://mapzen.com/documentation/tangram/sources/#generate_label_centroids"> label centroid
-     * generation</a> for polygon geometry
-     * {@code MapData} will be available from a data source with this name, just like a data source
-     * specified in a scene file. You cannot create more than one data source with the same name.
-     * If you call {@code addDataLayer} with the same name more than once, the same {@code MapData}
-     * object will be returned.
+     *                         "https://mapzen.com/documentation/tangram/sources/#generate_label_centroids"> label centroid
+     *                         generation</a> for polygon geometry
+     *                         {@code MapData} will be available from a data source with this name, just like a data source
+     *                         specified in a scene file. You cannot create more than one data source with the same name.
+     *                         If you call {@code addDataLayer} with the same name more than once, the same {@code MapData}
+     *                         object will be returned.
      */
     @NonNull
     public MapData addDataLayer(final String name, final boolean generateCentroid) {
@@ -693,6 +730,7 @@ public class MapController {
 
     /**
      * For package-internal use only; remove a {@code MapData} from this map
+     *
      * @param mapData The {@code MapData} to remove
      */
     void removeDataLayer(@NonNull final MapData mapData) {
@@ -703,8 +741,22 @@ public class MapController {
     }
 
     /**
-     * Manually trigger a re-draw of the map view
+     * For package-internal use only; remove a {@code MapData} from this map
      *
+     * @param mapData The {@code MapData} to remove
+     */
+    void removeDataLayer(@NonNull final MapData mapData, boolean removeClientTileSources) {
+        if (removeClientTileSources) {
+            clientTileSources.remove(mapData.name);
+        }
+        checkPointer(mapPointer);
+        checkPointer(mapData.pointer);
+        nativeRemoveClientDataSource(mapPointer, mapData.pointer);
+    }
+
+    /**
+     * Manually trigger a re-draw of the map view
+     * <p>
      * Typically this does not need to be called from outside Tangram, see {@link #setRenderMode(int)}.
      */
     @Keep
@@ -714,13 +766,14 @@ public class MapController {
 
     /**
      * Set whether the map view re-draws continuously
-     *
+     * <p>
      * Typically this does not need to be called from outside Tangram. The map automatically re-renders when the view
      * changes or when any animation in the map requires rendering.
+     *
      * @param renderMode Either 1, to render continuously, or 0, to render only when needed.
      */
     @Keep
-    public void setRenderMode(@IntRange(from=0,to=1) final int renderMode) {
+    public void setRenderMode(@IntRange(from = 0, to = 1) final int renderMode) {
         switch (renderMode) {
             case 0:
                 viewHolder.setRenderMode(GLViewHolder.RenderMode.RENDER_WHEN_DIRTY);
@@ -734,17 +787,18 @@ public class MapController {
 
     /**
      * Get the {@link TouchInput} for this map.
-     *
+     * <p>
      * {@code TouchInput} allows you to configure how gestures can move the map. You can set custom
      * responders for any gesture type in {@code TouchInput} to override or extend the default
      * behavior.
-     *
+     * <p>
      * Note that {@code MapController} assigns the default gesture responders for the pan, rotate,
      * scale, and shove gestures. If you set custom responders for these gestures, the default
      * responders will be replaced and those gestures will no longer move the map. To customize
      * these gesture responders and preserve the default map movement behavior: create a new gesture
      * responder, get the responder for that gesture from the {@code MapController}, and then in the
      * new responder call the corresponding methods on the {@code MapController} gesture responder.
+     *
      * @return The {@code TouchInput}.
      */
     public TouchInput getTouchInput() {
@@ -869,6 +923,7 @@ public class MapController {
 
     /**
      * Set the radius to use when picking features on the map. The default radius is 0.5 dp.
+     *
      * @param radius The radius in dp (density-independent pixels).
      */
     public void setPickRadius(final float radius) {
@@ -878,6 +933,7 @@ public class MapController {
 
     /**
      * Set a listener for feature pick events
+     *
      * @param listener The {@link FeaturePickListener} to call
      */
     public void setFeaturePickListener(@Nullable final FeaturePickListener listener) {
@@ -886,6 +942,7 @@ public class MapController {
 
     /**
      * Set a listener for scene update error statuses
+     *
      * @param listener The {@link SceneLoadListener} to call after scene has loaded
      */
     public void setSceneLoadListener(@Nullable final SceneLoadListener listener) {
@@ -894,6 +951,7 @@ public class MapController {
 
     /**
      * Set a listener for label pick events
+     *
      * @param listener The {@link LabelPickListener} to call
      */
     public void setLabelPickListener(@Nullable final LabelPickListener listener) {
@@ -912,6 +970,7 @@ public class MapController {
 
     /**
      * Set a listener for marker pick events
+     *
      * @param listener The {@link MarkerPickListener} to call
      */
     public void setMarkerPickListener(@Nullable final MarkerPickListener listener) {
@@ -931,6 +990,7 @@ public class MapController {
     /**
      * Query the map for geometry features at the given screen coordinates; results will be returned
      * in a callback to the object set by {@link #setFeaturePickListener(FeaturePickListener)}
+     *
      * @param posX The horizontal screen coordinate
      * @param posY The vertical screen coordinate
      */
@@ -944,6 +1004,7 @@ public class MapController {
     /**
      * Query the map for labeled features at the given screen coordinates; results will be returned
      * in a callback to the object set by {@link #setLabelPickListener(LabelPickListener)}
+     *
      * @param posX The horizontal screen coordinate
      * @param posY The vertical screen coordinate
      */
@@ -957,6 +1018,7 @@ public class MapController {
     /**
      * Query the map for a {@link Marker} at the given screen coordinates; results will be returned
      * in a callback to the object set by {@link #setMarkerPickListener(MarkerPickListener)}
+     *
      * @param posX The horizontal screen coordinate
      * @param posY The vertical screen coordinate
      */
@@ -970,6 +1032,7 @@ public class MapController {
     /**
      * Adds a {@link Marker} to the map which can be used to dynamically add points and polylines
      * to the map.
+     *
      * @return Newly created {@link Marker} object.
      */
     @NonNull
@@ -986,6 +1049,7 @@ public class MapController {
     /**
      * Removes the passed in {@link Marker} from the map.
      * Alias of Marker{@link #removeMarker(long)}
+     *
      * @param marker to remove from the map.
      * @return whether or not the marker was removed
      */
@@ -995,6 +1059,7 @@ public class MapController {
 
     /**
      * Removes the passed in {@link Marker} from the map.
+     *
      * @param markerId to remove from the map.
      * @return whether or not the marker was removed
      */
@@ -1023,8 +1088,9 @@ public class MapController {
 
     /**
      * Set a listener for map change events
+     *
      * @param listener The {@link MapChangeListener} to call when the map change events occur
-     *                due to camera updates or user interaction
+     *                 due to camera updates or user interaction
      */
     public void setMapChangeListener(@Nullable final MapChangeListener listener) {
         mapChangeListener = listener;
@@ -1038,7 +1104,7 @@ public class MapController {
                 case IDLE:
                     if (state == MapRegionChangeState.JUMPING) {
                         mapChangeListener.onRegionWillChange(false);
-                    } else if (state == MapRegionChangeState.ANIMATING){
+                    } else if (state == MapRegionChangeState.ANIMATING) {
                         mapChangeListener.onRegionWillChange(true);
                     }
                     break;
@@ -1063,6 +1129,7 @@ public class MapController {
 
     /**
      * Enqueue a Runnable to be executed synchronously on the rendering thread
+     *
      * @param r Runnable to run
      */
     public void queueEvent(@NonNull final Runnable r) {
@@ -1071,8 +1138,9 @@ public class MapController {
 
     /**
      * Make a debugging feature active or inactive
+     *
      * @param flag The feature to set
-     * @param on True to activate the feature, false to deactivate
+     * @param on   True to activate the feature, false to deactivate
      */
     public void setDebugFlag(@NonNull final DebugFlag flag, final boolean on) {
         nativeSetDebugFlag(flag.ordinal(), on);
@@ -1081,6 +1149,7 @@ public class MapController {
     /**
      * Set whether the OpenGL state will be cached between subsequent frames. This improves
      * rendering efficiency, but can cause errors if your application code makes OpenGL calls.
+     *
      * @param use Whether to use a cached OpenGL state; false by default
      */
     public void useCachedGlState(final boolean use) {
@@ -1090,9 +1159,10 @@ public class MapController {
 
     /**
      * Sets an opaque background color used as default color when a scene is being loaded
-     * @param red red component of the background color
+     *
+     * @param red   red component of the background color
      * @param green green component of the background color
-     * @param blue blue component of the background color
+     * @param blue  blue component of the background color
      */
     public void setDefaultBackgroundColor(final float red, final float green, final float blue) {
         checkPointer(mapPointer);
@@ -1212,14 +1282,18 @@ public class MapController {
         final HttpHandler.Callback callback = new HttpHandler.Callback() {
             @Override
             public void onFailure(@Nullable final IOException e) {
-                if (httpRequestHandles.remove(requestHandle) == null) { return; }
+                if (httpRequestHandles.remove(requestHandle) == null) {
+                    return;
+                }
                 String msg = (e == null) ? "" : e.getMessage();
                 nativeOnUrlComplete(mapPointer, requestHandle, null, msg);
             }
 
             @Override
             public void onResponse(final int code, @Nullable final byte[] rawDataBytes) {
-                if (httpRequestHandles.remove(requestHandle) == null) { return; }
+                if (httpRequestHandles.remove(requestHandle) == null) {
+                    return;
+                }
                 if (code >= 200 && code < 300) {
                     nativeOnUrlComplete(mapPointer, requestHandle, rawDataBytes, null);
                 } else {
@@ -1230,7 +1304,9 @@ public class MapController {
 
             @Override
             public void onCancel() {
-                if (httpRequestHandles.remove(requestHandle) == null) { return; }
+                if (httpRequestHandles.remove(requestHandle) == null) {
+                    return;
+                }
                 nativeOnUrlComplete(mapPointer, requestHandle, null, null);
             }
         };
@@ -1376,58 +1452,104 @@ public class MapController {
     // ==============
 
     private synchronized native void nativeOnLowMemory(long mapPtr);
+
     private synchronized native long nativeInit(AssetManager assetManager);
+
     private synchronized native void nativeDispose(long mapPtr);
+
     private synchronized native void nativeShutdown(long mapPtr);
+
     private synchronized native int nativeLoadScene(long mapPtr, String path, String[] updateStrings);
+
     private synchronized native int nativeLoadSceneAsync(long mapPtr, String path, String[] updateStrings);
+
     private synchronized native int nativeLoadSceneYaml(long mapPtr, String yaml, String resourceRoot, String[] updateStrings);
+
     private synchronized native int nativeLoadSceneYamlAsync(long mapPtr, String yaml, String resourceRoot, String[] updateStrings);
 
     private synchronized native void nativeGetCameraPosition(long mapPtr, double[] lonLatOut, float[] zoomRotationTiltOut);
+
     private synchronized native void nativeUpdateCameraPosition(long mapPtr, int set, double lon, double lat, float zoom, float zoomBy,
                                                                 float rotation, float rotateBy, float tilt, float tiltBy,
                                                                 double b1lon, double b1lat, double b2lon, double b2lat, int[] padding,
                                                                 float duration, int ease);
+
     private synchronized native void nativeFlyTo(long mapPtr, double lon, double lat, float zoom, float duration, float speed);
+
     private synchronized native void nativeGetEnclosingCameraPosition(long mapPtr, double aLng, double aLat, double bLng, double bLat, int[] buffer, double[] lngLatZoom);
+
     private synchronized native void nativeCancelCameraAnimation(long mapPtr);
+
     private synchronized native boolean nativeScreenPositionToLngLat(long mapPtr, double[] coordinates);
+
     private synchronized native boolean nativeLngLatToScreenPosition(long mapPtr, double[] coordinates);
+
     private synchronized native void nativeSetPixelScale(long mapPtr, float scale);
+
     private synchronized native void nativeSetCameraType(long mapPtr, int type);
+
     private synchronized native int nativeGetCameraType(long mapPtr);
+
     private synchronized native float nativeGetMinZoom(long mapPtr);
+
     private synchronized native void nativeSetMinZoom(long mapPtr, float minZoom);
+
     private synchronized native float nativeGetMaxZoom(long mapPtr);
+
     private synchronized native void nativeSetMaxZoom(long mapPtr, float maxZoom);
+
     private synchronized native void nativeHandleTapGesture(long mapPtr, float posX, float posY);
+
     private synchronized native void nativeHandleDoubleTapGesture(long mapPtr, float posX, float posY);
+
     private synchronized native void nativeHandlePanGesture(long mapPtr, float startX, float startY, float endX, float endY);
+
     private synchronized native void nativeHandleFlingGesture(long mapPtr, float posX, float posY, float velocityX, float velocityY);
+
     private synchronized native void nativeHandlePinchGesture(long mapPtr, float posX, float posY, float scale, float velocity);
+
     private synchronized native void nativeHandleRotateGesture(long mapPtr, float posX, float posY, float rotation);
+
     private synchronized native void nativeHandleShoveGesture(long mapPtr, float distance);
+
     private synchronized native void nativeSetPickRadius(long mapPtr, float radius);
+
     private synchronized native void nativePickFeature(long mapPtr, float posX, float posY);
+
     private synchronized native void nativePickLabel(long mapPtr, float posX, float posY);
+
     private synchronized native void nativePickMarker(long mapPtr, float posX, float posY);
+
     private synchronized native long nativeMarkerAdd(long mapPtr);
+
     private synchronized native boolean nativeMarkerRemove(long mapPtr, long markerID);
+
     private synchronized native boolean nativeMarkerSetStylingFromString(long mapPtr, long markerID, String styling);
+
     private synchronized native boolean nativeMarkerSetStylingFromPath(long mapPtr, long markerID, String path);
+
     private synchronized native boolean nativeMarkerSetBitmap(long mapPtr, long markerID, Bitmap bitmap, float density);
+
     private synchronized native boolean nativeMarkerSetPoint(long mapPtr, long markerID, double lng, double lat);
+
     private synchronized native boolean nativeMarkerSetPointEased(long mapPtr, long markerID, double lng, double lat, float duration, int ease);
+
     private synchronized native boolean nativeMarkerSetPolyline(long mapPtr, long markerID, double[] coordinates, int count);
+
     private synchronized native boolean nativeMarkerSetPolygon(long mapPtr, long markerID, double[] coordinates, int[] rings, int count);
+
     private synchronized native boolean nativeMarkerSetVisible(long mapPtr, long markerID, boolean visible);
+
     private synchronized native boolean nativeMarkerSetDrawOrder(long mapPtr, long markerID, int drawOrder);
+
     private synchronized native void nativeMarkerRemoveAll(long mapPtr);
+
     private synchronized native void nativeUseCachedGlState(long mapPtr, boolean use);
+
     private synchronized native void nativeSetDefaultBackgroundColor(long mapPtr, float r, float g, float b);
 
     private synchronized native long nativeAddClientDataSource(long mapPtr, String name, boolean generateCentroid);
+
     private synchronized native void nativeRemoveClientDataSource(long mapPtr, long sourcePtr);
 
     private synchronized native void nativeSetDebugFlag(int flag, boolean on);

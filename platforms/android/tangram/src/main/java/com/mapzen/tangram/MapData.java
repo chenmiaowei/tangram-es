@@ -82,6 +82,22 @@ public class MapData {
     }
 
     /**
+     * Remove this {@code MapData} from the map it is currently associated with. Using this object
+     * after {@code remove} is called will cause an exception to be thrown. {@code remove} is called
+     * on every {@code MapData} associated with a map when its {@code MapController} is destroyed.
+     */
+    public void remove(boolean removeClientTileSources) {
+        final MapController map = mapController;
+        if (map == null) {
+            return;
+        }
+        map.removeDataLayer(this, removeClientTileSources);
+
+        mapController = null;
+        pointer = 0;
+    }
+
+    /**
      * Remove all features from this collection.
      */
     public void clear() {

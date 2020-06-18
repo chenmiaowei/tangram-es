@@ -26,7 +26,7 @@ public class LabelPickResult {
     private LabelType type;
 
 
-    LabelPickResult(final Map<String, String> properties, final double longitude, final double latitude, final float screenX, final float screenY, final int type) {
+    public LabelPickResult(final Map<String, String> properties, final double longitude, final double latitude, final float screenX, final float screenY, final int type) {
         this.properties = properties;
         this.coordinates = new LngLat(longitude, latitude);
         this.screenPosition = new PointF(screenX, screenY);
